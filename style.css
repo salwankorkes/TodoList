@@ -1,0 +1,59 @@
+form{
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-right: 50px;
+    margin-left: 50px;
+}
+
+.button {
+	width: 200px;
+	height: 50px;
+    border-style: none;
+    color: white;
+    padding: 15px 20px;	
+    text-align: center;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+#btnAddTask{
+    background-color: Blue;
+	/*box-shadow: h-offset v-offset blur color*/
+	box-shadow: 2px 2px 20px #34dbb9;
+}
+
+#btnDeleteTask{
+    background-color: Red;
+	box-shadow: 2px 2px 20px Orange;
+}
+
+.taskStatusButton{
+	width: 100px;
+}
+
+#txtAddTask, #dtpDueDate {
+	height: 50px;
+	font-size: 16px;
+}
+
+#txtAddTask{
+	width: 50%;
+}
+
+.taskItem{
+    padding: 2px 30px;	
+}
+
+table{
+    border-collapse: collapse;
+    width: 80%;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #ADD8E6;}
+tr:nth-child(odd) {background-color: #ffff99;}
+tr:nth-child(1) {background-color: white;}
