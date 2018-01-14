@@ -20,16 +20,11 @@
 	
 	<div id="topSection">	
 		<div id="addTaskDiv" class="taskDiv">
-			<button id="btnAddTask" class="button" type="submit" name="btnAddTask" >Add Task</button>			
-			<input id="txtAddTask" type="text" name="txtAddTask" placeholder="Add a new task">
-			<input id="dtpDueDate" type="datetime-local" name="dtpDueDate" value="setDefaultDueDate()">
+			<span id="lblTaskText" class="headerLabel">Task: <span><input id="txtAddTask" type="text" name="txtAddTask" placeholder="Add a new task">
+			<span id="lblDueDate" class="headerLabel">Due Date: <span><input id="dtpDueDate" type="datetime-local" name="dtpDueDate" value="setDefaultDueDate()">
+			<button id="btnAddTask" class="button" type="submit" name="btnAddTask" >Add Task</button>				
 		</div>
 	</div>
-	
-
-
-
-
 
 	<?php
 		abstract class eTaskStatus
@@ -71,76 +66,71 @@
 			}
 		}		
 
-		$result = $sqlConnection->query("SELECT TaskStatus, COUNT(ID) AS TaskCount FROM $tableName GROUP BY TaskStatus ORDER BY TaskStatus ASC");
-		
-		$index = 0;
-		
-		if ($result->num_rows != 0)
+		function loadMainContents(&$pSqlConnection, $pTableName)
 		{
-			echo ("<br><div class='mainTableDiv'>" 
-				."<table id='mainTable'>"
-				."<tr>"
-				."<th>Task Status</th>"
-				."<th>Count</th> "
-				."</tr>"
-				."<tr>");
-				
-			while ($result->num_rows != 0 && $row=($result->fetch_assoc()))
-			{
-				$tmpTaskStatus = "";
-				switch ($row[TaskStatus]) {
-					case (eTaskStatus::Pending):
-						$tmpTaskStatus = "Pending";
-						break;
-					case (eTaskStatus::Started):
-						$tmpTaskStatus = "Started";
-						break;
-					case (eTaskStatus::Completed):
-						$tmpTaskStatus = "Completed";
-						break;						
-					case (eTaskStatus::Late):
-						$tmpTaskStatus = "Late";
-						break;	
-					default:
-						echo "Unknown Value!";
-				}				
-				
-				echo("<td>"	
-				."<button id='btnTaskStatus' class='taskStatusButton' type='submit' name='btnTaskStatus' value=$row[TaskStatus]>$tmpTaskStatus</button>"			
-				."</td>"			
-				."<td>"
-				."$row[TaskCount]"
-				."</td>"
-				."</tr>");
-				
-				++$index;
-			}
+			$result = $pSqlConnection->query("SELECT TaskStatus, COUNT(ID) AS TaskCount FROM $pTableName GROUP BY TaskStatus ORDER BY TaskStatus ASC");
 			
-			echo ("</table></div>");
-		}
-				
-		if (isset($_POST["btnAddTask"])) {
-			$taskText = $_POST["txtAddTask"];
-			$taskDueDate = $_POST["dtpDueDate"];
+			$index = 0;
+			$totalTasks=0;
 			
-			if (strlen(trim($taskText)) !=0 && strlen(trim($taskDueDate)) !=0)
-			{				
-				$sqlConnection->query("INSERT INTO todolist(ID, TaskText, TaskStatus, TaskDueDate, DateAdded) VALUES (UUID(),'$taskText',0,'$taskDueDate',NOW())");
-			}		
-		} 
-		else if(isset($_POST["btnDeleteTask"]))
-		{			
-			foreach ($_POST['tasksArray'] AS $item)
+			if ($result->num_rows != 0)
 			{
-				$sqlConnection->query("DELETE FROM $tableName WHERE ID = '$item'");
-			}
-		}
-		else if(isset($_POST["btnTaskStatus"]))
-		{	
-			$myTaskStatus = $_POST["btnTaskStatus"];
-			loadTasks($myTaskStatus , $sqlConnection, $tableName);
-		}
+				echo ("<br><div class='mainTableDiv'>" 
+					."<table id='mainTable'>"
+					."<tr>"
+					."<th>Task Status</th>"
+					."<th>Count</th> "
+					."</tr>"
+					."<tr>");
+					
+				while ($result->num_rows != 0 && $row=($result->fetch_assoc()))
+				{
+					$tmpTaskStatus = "";
+					switch ($row[TaskStatus]) {
+						case (eTaskStatus::Pending):
+							$tmpTaskStatus = "Pending";
+							break;
+						case (eTaskStatus::Started):
+							$tmpTaskStatus = "Started";
+							break;
+						case (eTaskStatus::Completed):
+							$tmpTaskStatus = "Completed";
+							break;						
+						case (eTaskStatus::Late):
+							$tmpTaskStatus = "Late";
+							break;	
+						default:
+							echo "Unknown Status!";
+					}				
+					
+					echo("<td>"	
+					."<button id='btnTaskStatus' class='taskStatusButton' type='submit' name='btnTaskStatus' value=$row[TaskStatus]>$tmpTaskStatus</button>"			
+					."</td>"			
+					."<td>"
+					."$row[TaskCount]"
+					."</td>"
+					."</tr>");
+					
+					$totalTasks+=$row[TaskCount];										
+					++$index;
+				}
 				
+				echo("<tr id='totalRow'>"
+					."<td id='totalText'>"	
+					."Total"			
+					."</td>"			
+					."<td id='totalValue'>"
+					."$totalTasks"
+					."</td>"
+					."</tr>"
+					."</table></div><br/><hr/>");
+			}
+			else
+			{
+				echo ("<label id='tasksMessage'>You Have No Tasks.</label>");
+			}					
+		}
+	
 		function loadTasks($pTaskStatus, &$pSqlConnection, $pTableName)
 		{			
 			$sqlCommand="SELECT * FROM $pTableName";
@@ -168,41 +158,41 @@
 				
 				while ($result->num_rows != 0 && $row = ( $result->fetch_assoc() ))
 				{
-				$tmpTaskStatus = "";
-				switch ($row[TaskStatus]) {
-					case (eTaskStatus::Pending):
-						$tmpTaskStatus = "Pending";
-						break;
-					case (eTaskStatus::Started):
-						$tmpTaskStatus = "Started";
-						break;
-					case (eTaskStatus::Completed):
-						$tmpTaskStatus = "Completed";
-						break;						
-					case (eTaskStatus::Late):
-						$tmpTaskStatus = "Late";
-						break;	
-					default:
-						echo "Unknown Value!";
-				}				
-				
-				$dueDate = date('m-d-Y h:i A', strtotime($row[TaskDueDate]));
-				$dateAdded = date('m-d-Y h:i A', strtotime($row[DateAdded]));
-				
-				echo("<td>"	
-				."<input type='checkbox' class='taskCheckBox' name='tasksArray[]' value=$row[ID]> $row[TaskText]"			
-				."</td>"
-				."<td>"
-				."$dueDate"
-				."</td>"				
-				."<td>"
-				."$tmpTaskStatus"
-				."</td>"
-				."<td>"
-				."$row[DateAdded]"
-				."</td>"				
-				."</tr>");
-				
+					$tmpTaskStatus = "";
+					switch ($row[TaskStatus]) {
+						case (eTaskStatus::Pending):
+							$tmpTaskStatus = "Pending";
+							break;
+						case (eTaskStatus::Started):
+							$tmpTaskStatus = "Started";
+							break;
+						case (eTaskStatus::Completed):
+							$tmpTaskStatus = "Completed";
+							break;						
+						case (eTaskStatus::Late):
+							$tmpTaskStatus = "Late";
+							break;	
+						default:
+							echo "Unknown Value!";
+					}				
+					
+					$dueDate = date('m-d-Y h:i A', strtotime($row[TaskDueDate]));
+					$dateAdded = date('m-d-Y h:i A', strtotime($row[DateAdded]));
+					
+					echo("<td>"	
+					."<input type='checkbox' class='taskCheckBox' name='tasksArray[]' value=$row[ID]> $row[TaskText]"			
+					."</td>"
+					."<td>"
+					."$dueDate"
+					."</td>"				
+					."<td>"
+					."$tmpTaskStatus"
+					."</td>"
+					."<td>"
+					."$row[DateAdded]"
+					."</td>"				
+					."</tr>");
+					
 					++$index;
 				}
 
@@ -212,6 +202,39 @@
 					."<button id='btnDeleteTask' class='button' type='submit' name='btnDeleteTask' >Remove Task(s)</button>"
 					."</div>");	
 			}
+		}
+
+		loadMainContents($sqlConnection, $tableName);
+				
+		if (isset($_POST["btnAddTask"])) {
+			$taskText = $_POST["txtAddTask"];
+			$taskDueDate = $_POST["dtpDueDate"];
+			
+			if (strlen(trim($taskText)) !=0 && strlen(trim($taskDueDate)) !=0)
+			{				
+				$sqlConnection->query("INSERT INTO todolist(ID, TaskText, TaskStatus, TaskDueDate, DateAdded) VALUES (UUID(),'$taskText',0,'$taskDueDate',NOW())");
+			}		
+		} 
+		else if(isset($_POST["btnDeleteTask"]))
+		{			
+			$tasksTodelete = $_POST['tasksArray'];
+			
+			if (sizeof($tasksTodelete)>0)
+			{
+				foreach ($_POST['tasksArray'] AS $item)
+				{
+					$sqlConnection->query("DELETE FROM $tableName WHERE ID = '$item'");
+				}				
+			}
+			else
+			{
+				echo "No items to delete!";
+			}
+		}
+		else if(isset($_POST["btnTaskStatus"]))
+		{	
+			$myTaskStatus = $_POST["btnTaskStatus"];
+			loadTasks($myTaskStatus , $sqlConnection, $tableName);
 		}
 		
 		$sqlConnection->commit();
