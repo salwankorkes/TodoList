@@ -5,13 +5,13 @@ This is a simple php project that can be utilized to manage a todo list. It allo
 A screen cast is included with the project (./BriefPresentation/ToDoPresentation.mp4) file which goes over the basic functionality and usage of this application.
 
 
-##Dependencies
+## Dependencies
 
 1. Apache Server
 2. MySQL
 
 
-##Deployment
+## Deployment
 You need to install Apache Server and MySQL on the target machine. The Apache server must be configured on port 80 and the MySQL port 3306. You can use (https://bitnami.com/stacks) to download WAMP Stack that will include Apache server and MySql, or you can download them separately.
 
 
