@@ -58,7 +58,7 @@
 		}		
 
 		
-		$sqlConnection->query("UPDATE $tableName SET TaskStatus=3 WHERE TaskStatus <> 2 AND TaskDueDate < now()");
+		$sqlConnection->query("UPDATE $tableName SET TaskStatus=3 WHERE TaskStatus <> 1 AND TaskStatus <> 2 AND TaskDueDate < now()");
 		
 		//$myTaskStatus=-1;
 		
