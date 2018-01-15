@@ -12,8 +12,11 @@ form{
     color: white;
     padding: 15px 20px;	
     text-align: center;
-	font-weight: bold;
 	font-size: 20px;
+}
+
+.button:hover{
+	font-weight: bold;
 }
 
 .headerLabel, #tasksMessage, #totalRow{
@@ -32,9 +35,15 @@ form{
 	float: right;
 }
 
+#btnUpdateStatus{
+    background-color: Green;
+	box-shadow: 2px 2px 20px Yellow;	
+}
+
 #btnDeleteTask{
     background-color: Red;
 	box-shadow: 2px 2px 20px Orange;
+	margin-left: 10px;
 }
 
 .taskStatusButton{

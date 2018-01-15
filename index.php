@@ -6,16 +6,6 @@
 <body>
 
 <form action="index.php" method="post">
-
-
-	<script>
-		function setDefaultDueDate() {
-			var $dtPicker = $('#dtpDueDate');
-			$dtPicker.datepicker();
-			$dtPicker.datepicker('setDate', new Date());
-		}
-	</script>
-
 	<h1>My To Do List</h1>
 	
 	<div id="topSection">	
@@ -41,10 +31,11 @@
 		$dbName = "todo_db_PHP";
 		$tableName = "todolist";
 		$sqlConnection = new mysqli($dbHost, $dbUser, $dbPassword);
-			
+		
 		if(!isset($_SESSION['initialLoad']))
 		{
-			$_SESSION['initialLoad'] = 1;		
+			$_SESSION['initialLoad'] = 1;	
+						
 			$sqlCommand = "CREATE DATABASE IF NOT EXISTS $dbName";
 			
 			if ($sqlConnection->query($sqlCommand)==FALSE)
@@ -66,6 +57,11 @@
 			}
 		}		
 
+		
+		$sqlConnection->query("UPDATE $tableName SET TaskStatus=3 WHERE TaskStatus <> 2 AND TaskDueDate < now()");
+		
+		//$myTaskStatus=-1;
+		
 		function loadMainContents(&$pSqlConnection, $pTableName)
 		{
 			$result = $pSqlConnection->query("SELECT TaskStatus, COUNT(ID) AS TaskCount FROM $pTableName GROUP BY TaskStatus ORDER BY TaskStatus ASC");
@@ -153,8 +149,12 @@
 					."<th>Due Date</th>"
 					."<th>Status</th> "
 					."<th>Date Added</th>"
+					."<th>Change Status</th>"
 					."</tr>"
 					."<tr>");
+				
+				$isTaskStarted ='';
+				$isTaskCompleted='';
 				
 				while ($result->num_rows != 0 && $row = ( $result->fetch_assoc() ))
 				{
@@ -165,9 +165,11 @@
 							break;
 						case (eTaskStatus::Started):
 							$tmpTaskStatus = "Started";
+							$isTaskStarted = 'checked';
 							break;
 						case (eTaskStatus::Completed):
 							$tmpTaskStatus = "Completed";
+							$isTaskCompleted='checked';
 							break;						
 						case (eTaskStatus::Late):
 							$tmpTaskStatus = "Late";
@@ -177,8 +179,9 @@
 					}				
 					
 					$dueDate = date('m-d-Y h:i A', strtotime($row[TaskDueDate]));
-					$dateAdded = date('m-d-Y h:i A', strtotime($row[DateAdded]));
-					
+					$dateAdded = date('m-d-Y h:i A', strtotime($row[DateAdded]));					
+					$radioBottonName="rd".$row[ID];
+				
 					echo("<td>"	
 					."<input type='checkbox' class='taskCheckBox' name='tasksArray[]' value=$row[ID]> $row[TaskText]"			
 					."</td>"
@@ -190,7 +193,12 @@
 					."</td>"
 					."<td>"
 					."$row[DateAdded]"
-					."</td>"				
+					."</td>"
+					."<td>"					
+					."<input type='radio' name='$radioBottonName' value='Started' $isTaskStarted>"
+					."Started"	
+					."<input type='radio' name='$radioBottonName' value='Completed' $isTaskCompleted>Completed"
+					."</td>"					
 					."</tr>");
 					
 					++$index;
@@ -198,30 +206,68 @@
 
 				echo ("</table></div>");
 
-				echo ("<br><div id='deleteTaskDiv' class='taskDiv'>"
-					."<button id='btnDeleteTask' class='button' type='submit' name='btnDeleteTask' >Remove Task(s)</button>"
+				echo ("<br><div id='bottomDiv' class='taskDiv'>"
+					."<button id='btnUpdateStatus' class='button' type='submit' name='btnUpdateStatus' alt='Update the Status for the Selected Tasks'>Update Selected</button>"
+					."&nbsp;&nbsp;&nbsp;"					
+					."<button id='btnDeleteTask' class='button' type='submit' name='btnDeleteTask' alt='Remove Selected Tasks'>Remove Task(s)</button>"
 					."</div>");	
 			}
 		}
 
 		loadMainContents($sqlConnection, $tableName);
 				
-		if (isset($_POST["btnAddTask"])) {
+		if (isset($_POST["btnAddTask"]))
+		{			
 			$taskText = $_POST["txtAddTask"];
 			$taskDueDate = $_POST["dtpDueDate"];
 			
 			if (strlen(trim($taskText)) !=0 && strlen(trim($taskDueDate)) !=0)
 			{				
-				$sqlConnection->query("INSERT INTO todolist(ID, TaskText, TaskStatus, TaskDueDate, DateAdded) VALUES (UUID(),'$taskText',0,'$taskDueDate',NOW())");
-			}		
-		} 
+				$sqlConnection->query("INSERT INTO $tableName(ID, TaskText, TaskStatus, TaskDueDate, DateAdded) VALUES (UUID(),'$taskText',0,'$taskDueDate',NOW())");
+			}
+			
+			loadTasks($myTaskStatus , $sqlConnection, $tableName);
+		}
+		else if(isset($_POST["btnUpdateStatus"]))
+		{	
+			$tasksToUpdate = $_POST['tasksArray'];
+
+			if (sizeof($tasksToUpdate)>0)
+			{
+				foreach ($tasksToUpdate AS $item)
+				{	
+					$rdName="rd".$item;					
+					$selectedRadioButton = $_POST[$rdName];					
+					
+					$updatedStatus=5;
+					
+					if (isset($selectedRadioButton))
+					{
+						if ($selectedRadioButton=="Started")
+						{
+							$updatedStatus=eTaskStatus::Started;
+						}
+						else if ($selectedRadioButton=="Completed")
+						{							
+							$updatedStatus=eTaskStatus::Completed;
+						}
+						
+						$sqlConnection->query("UPDATE $tableName SET TaskStatus=$updatedStatus WHERE ID = '$item'");
+					}
+					else
+					{
+						echo "nothing changed <br/>";
+					}
+				}				
+			}
+		}				
 		else if(isset($_POST["btnDeleteTask"]))
 		{			
-			$tasksTodelete = $_POST['tasksArray'];
+			$tasksToDelete = $_POST['tasksArray'];
 			
-			if (sizeof($tasksTodelete)>0)
+			if (sizeof($tasksToDelete)>0)
 			{
-				foreach ($_POST['tasksArray'] AS $item)
+				foreach ($tasksToDelete AS $item)
 				{
 					$sqlConnection->query("DELETE FROM $tableName WHERE ID = '$item'");
 				}				
@@ -230,14 +276,14 @@
 			{
 				echo "No items to delete!";
 			}
+			
+			loadTasks($myTaskStatus , $sqlConnection, $tableName);		
 		}
 		else if(isset($_POST["btnTaskStatus"]))
 		{	
 			$myTaskStatus = $_POST["btnTaskStatus"];
 			loadTasks($myTaskStatus , $sqlConnection, $tableName);
 		}
-		
-		$sqlConnection->commit();
 
 		$sqlConnection->close();
 	?>
