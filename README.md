@@ -23,13 +23,13 @@ Actual Time: 45 minutes
 Notes: I had to watch some videos on YouTube to make sure I install it properly.  
 Issues: None  
 
-**2. Get used to the phpMyAdmin environment"
+**2. Get used to the phpMyAdmin environment"**
 Estimated Time: 2 hour  
 Actual Time: 2 hour  
 Notes: I was just browsing to see the different functionalities and features of this tool.
 Issues: None
 
-**3. Get used to MySQL and Create MyFisrt Table"
+**3. Get used to MySQL and Create MyFisrt Table"**
 Estimated Time: 2 hour  
 Actual Time: 3 hour  
 Notes: I expected that since I am good with MS SQL server that MySQL would not take me longer than 2 hours. Unfortunately, it did as working on php GUI is far more unclear than working on MS SQL Management Studio.
@@ -47,7 +47,7 @@ Actual Time: 1 hour
 Notes: It was fairly easy to work with a basic HTML/PHP file.
 Issues: None  
 
-**6. Establish database connection from php to MySQL **
+**6. Establish database connection from php to MySQL**
 Estimated Time: 2 hours  
 Actual Time: 6 hours  
 Notes: I had to spend some time researching to find out how to connect from php to MySQL.  
@@ -96,26 +96,26 @@ Issues: I had a major issue of getting a radio button that was check for the tas
 
 ## Test Cases
 
-** Database Creation if it does not exist **
+**Database Creation if it does not exist**
 Steps: 
 1. Delete the database "todo_db"
 2. Start the web-page.
 3. The database "todo_db" should be created.
  
- ** Database Creation if it does not exist **
+ **Database Creation if it does not exist**
 Steps: 
 1. Delete the database table "todolist"
 2. Start the web-page.
 3. The database table "todolist" should be created with the proper fields.
 
-** Add Task **
+**Add Task**
 Steps: 
 1. Start the web-page 
 2. Enter some value in the Task field.
 3. Click "Add Task" button.
 4. The task will be added as a "Pending" task. Click on the Pending button and you should see the task there.
  
-** Delete Task **
+**Delete Task**
 Steps: 
 1. Start the web-page 
 2. Click on any grouped tasks (I.E: Pending, Started, Completed, Late).
@@ -123,7 +123,7 @@ Steps:
 4. Click "Delete Task(s)" button.
 5. The task(s) will be removed from the database. Click on the same status-grouping button and you should see the task(s) is no longer there.
 
-** Update Task Status **
+**Update Task Status**
 Steps: 
 1. Start the web-page 
 2. Click on any grouped tasks (I.E: Pending, Started, Completed, Late).
@@ -131,10 +131,10 @@ Steps:
 4. Check the check-boxes right before the task(s) that you would like to update the status for.
 5. The task status will be updated on the database. Click on the same status-grouping that you have update the task to, and you should see it there. 
 
-** Seeing individual Tasks under a certain status **
+**Seeing individual Tasks under a certain status**
 Steps: 
 1. Start the web-page 
-2. If you don't have any tasks added yet, then add a task as shown previously in the "** Add Task **" test case.
+2. If you don't have any tasks added yet, then add a task as shown previously in the "**Add Task**" test case.
 3. Click on any grouped tasks (I.E: Pending, Started, Completed, Late).
 4. You should see all the individual tasks under that status.
 
