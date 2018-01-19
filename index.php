@@ -27,7 +27,7 @@
 
 		$dbHost = "localhost";
 		$dbUser = "root";
-		$dbPassword = "Sal0149";
+		$dbPassword = "";
 		$dbName = "todo_db";
 		$tableName = "todolist";
 		$sqlConnection = new mysqli($dbHost, $dbUser, $dbPassword);
